@@ -8,7 +8,7 @@ class SuperValidatableTestCase extends CakeTestCase {
 		$this->Validatable->Behaviors->attach('SuperValidatable');
 	}
     
-    function testconfirmFields() {
+    function testConfirmFields() {
 
 		// Testing default hash option salted sha1
 		$hashedPw = Security::hash('abcdefg', 'sha1', true);
