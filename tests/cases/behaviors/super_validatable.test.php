@@ -1,7 +1,7 @@
 <?php
 App::import('Security');
 class SuperValidatableTestCase extends CakeTestCase {
-    var $fixtures = array( 'app.super_validatable' );
+    var $fixtures = array( 'super_validatable.super_validatable' );
 	
 	function startTest() {
 		$this->Validatable =& ClassRegistry::init('Validatable');
