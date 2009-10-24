@@ -117,6 +117,9 @@ class SuperValidatableBehavior extends ModelBehavior {
 		return $passed;
 	}
 
+/*
+ * 
+ */
 	function isChecked(&$model, $field) {
 		$value = array_values($field);
 		$passed = (in_array($value[0], array('0', 0, false))) ? false : true;
@@ -177,5 +180,45 @@ class SuperValidatableBehavior extends ModelBehavior {
 		}
 		return true;
 	}
-}
+/**
+ * With this you can validate a field or a list of fields against one or more other fields
+ * You can tell this function to hash
+ * 
+ * @param object $model
+ * @param string $check field to confirm
+ * @param array $fields list of fields to be confirmed against:
+ * @return boolean true if all fields did match, false otherwise
+ */
+	public function confirmFields(&$model, $check, $params = array()) {
+		$valid = false;
+		$defaultParams = array(
+			'fields' => array(),
+			'hash' => false,
+			'hashOptions' => array(
+				'method' => 'sha1',
+				'salt' => true,
+				'fields' => array()
+			),
+			'skip' => true
+		);
+		$params = array_merge($defaultParams, $params);
+		extract($params);
+		foreach ($fields as $field) {
+			if (!isset($model->data[$model->alias][$field]) && $skip != false) {
+				return false;
+			}
+			
+			if ($hash === true && (empty($hashOptions['fields']) || in_array($fields, $hashOptions['fields']))) {
+				$confirm = Security::hash($model->data[$model->alias][$field], $hashOptions['method'], $hashOptions['salt'];
+			} else {
+				$confirm = $model->data[$model->alias][$field];
+			}
+			
+			$valid = ($confirm == $check[0]);
+			if (!$valid) {
+				return $valid;
+			}
+		}
+		return $valid;
+	}
 ?>
