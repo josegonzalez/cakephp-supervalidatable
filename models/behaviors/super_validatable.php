@@ -181,15 +181,21 @@ class SuperValidatableBehavior extends ModelBehavior {
 		return true;
 	}
 /**
- * With this you can validate a field or a list of fields against one or more other fields
- * You can tell this function to hash
+ * With this you can validate a field against one or more other fields.
  * 
  * @param object $model
- * @param string $check field to confirm
- * @param array $fields list of fields to be confirmed against:
+ * @param array $check field to confirm
+ * @param array $params parameter:
+ * 	- fields: array list of fields (default: array())
+ *  - hash: boolean if the fields should be hashed (default: false)
+ *  - hashOptions: options if hash is true:
+ *  	- method: string cake's supported hash method (default: 'sha1')
+ *  	- salt: boolean if cake's salt should be used (default: true)
+ *  	- fields: array list of fields that should be hashed, the others are not hashed (default: array())
+ *  - skip: boolean, if you want to continue on fields that don't exist, set this to true (default: false)
  * @return boolean true if all fields did match, false otherwise
  */
-	public function confirmFields(&$model, $check, $params = array()) {
+	function confirmFields(&$model, $check, $params = array()) {
 		$valid = false;
 		$defaultParams = array(
 			'fields' => array(),
@@ -199,17 +205,17 @@ class SuperValidatableBehavior extends ModelBehavior {
 				'salt' => true,
 				'fields' => array()
 			),
-			'skip' => true
+			'skip' => false
 		);
 		$params = array_merge($defaultParams, $params);
 		extract($params);
 		foreach ($fields as $field) {
-			if (!isset($model->data[$model->alias][$field]) && $skip != false) {
+			if (!isset($model->data[$model->alias][$field]) && $skip !== true) {
 				return false;
 			}
 			
 			if ($hash === true && (empty($hashOptions['fields']) || in_array($fields, $hashOptions['fields']))) {
-				$confirm = Security::hash($model->data[$model->alias][$field], $hashOptions['method'], $hashOptions['salt'];
+				$confirm = Security::hash($model->data[$model->alias][$field], $hashOptions['method'], $hashOptions['salt']);
 			} else {
 				$confirm = $model->data[$model->alias][$field];
 			}
