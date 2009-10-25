@@ -8,7 +8,7 @@ class SuperValidatableTestCase extends CakeTestCase {
 		$this->Validatable->Behaviors->attach('SuperValidatable');
 	}
     
-    function testConfirmFields() {
+    function testconfirmFields() {
 
 		// Testing default hash option salted sha1
 		$hashedPw = Security::hash('abcdefg', 'sha1', true);
@@ -149,5 +149,112 @@ class SuperValidatableTestCase extends CakeTestCase {
 		);
 		$this->assertTrue($valid);
     }
+
+	function testIsWordsInText() {
+		// testing default true
+		$data = array(
+			'Validatable' => array(
+				'password' => 'Lorem Ipsum dolor sit',
+				'pw_confirm' => 'lorem',
+				'another_field' => 'ipsum'
+			)
+		);
+		$this->Validatable->data = $data;
+		$valid = $this->Validatable->isWordsInText(
+			array('password' => 'Lorem Ipsum dolor sit'),
+			array(
+				'fields' => array('pw_confirm', 'another_field')
+			)
+		);
+		$this->assertTrue($valid);
+		// testing default false
+		$data = array(
+			'Validatable' => array(
+				'password' => 'Ipsum Lorem dolor sit',
+				'pw_confirm' => 'Lorem',
+				'another_field' => 'Can'
+			)
+		);
+		$this->Validatable->data = $data;
+		$valid = $this->Validatable->isWordsInText(
+			array('password' => 'Ipsum Lorem dolor sit'),
+			array(
+				'fields' => array('pw_confirm', 'another_field'),
+			)
+		);
+		$this->assertFalse($valid);
+
+		// testing ordered mode false
+		$data = array(
+			'Validatable' => array(
+				'password' => 'Ipsum Lorem dolor sit',
+				'pw_confirm' => 'Lorem',
+				'another_field' => 'Ipsum'
+			)
+		);
+		$this->Validatable->data = $data;
+		$valid = $this->Validatable->isWordsInText(
+			array('password' => 'Ipsum Lorem dolor sit'),
+			array(
+				'fields' => array('pw_confirm', 'another_field'),
+				'ordered' => true
+			)
+		);
+		$this->assertFalse($valid);
+		// testing ordered mode true
+		$data = array(
+			'Validatable' => array(
+				'password' => 'Lorem Ipsum dolor sit',
+				'pw_confirm' => 'Lorem',
+				'another_field' => 'Ipsum'
+			)
+		);
+		$this->Validatable->data = $data;
+		$valid = $this->Validatable->isWordsInText(
+			array('password' => 'Lorem Ipsum dolor sit'),
+			array(
+				'fields' => array('pw_confirm', 'another_field'),
+				'ordered' => true
+			)
+		);
+		$this->assertTrue($valid);
+
+
+
+		// testing caseSensitive mode true
+		$data = array(
+			'Validatable' => array(
+				'password' => 'lorem Ipsum dolor sit',
+				'pw_confirm' => 'lorem',
+				'another_field' => 'Ipsum'
+			)
+		);
+		$this->Validatable->data = $data;
+		$valid = $this->Validatable->isWordsInText(
+			array('password' => 'Lorem Ipsum dolor sit'),
+			array(
+				'fields' => array('pw_confirm', 'another_field'),
+				'caseSensitive' => true
+			)
+		);
+		$this->assertTrue($valid);
+		// testing caseSensitive mode false
+		$data = array(
+			'Validatable' => array(
+				'password' => 'lorem Ipsum dolor sit',
+				'pw_confirm' => 'Lorem',
+				'another_field' => 'Ipsum'
+			)
+		);
+		$this->Validatable->data = $data;
+		$valid = $this->Validatable->isWordsInText(
+			array('password' => 'Lorem Ipsum dolor sit'),
+			array(
+				'fields' => array('pw_confirm', 'another_field'),
+				'caseSensitive' => true
+			)
+		);
+		$this->assertFalse($valid);
+	}
 } 
 ?>

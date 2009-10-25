@@ -32,8 +32,6 @@ class SuperValidatableBehavior extends ModelBehavior {
  * @access public
  */
 	var $mapMethods = array();
-
-
 /**
  * Initiate Validatable Behavior
  *
@@ -45,7 +43,6 @@ class SuperValidatableBehavior extends ModelBehavior {
 	function setup(&$model, $config = array()) {
 
 	}
-
 /**
  * Compares whether or not a date is some number of days after a date
  *
@@ -94,7 +91,14 @@ class SuperValidatableBehavior extends ModelBehavior {
 		$passed = (in_array($value[0], array('0', 0, false))) ? false : true;
 		return $passed;
 	}
-
+/**
+ * Put something here...
+ * 
+ * @param object $model
+ * @param array $field [optional]
+ * @param array $params [optional]
+ * @return boolean
+ */
 	public function notEqualTo(&$model, $field = array(), $params = array()) { 
 		foreach ($field as $key => $value) {
 			foreach ($params as $param) {
@@ -149,6 +153,7 @@ class SuperValidatableBehavior extends ModelBehavior {
 	}
 /**
  * With this you can validate a field against one or more other fields.
+ * @author Thomas Ploch
  * 
  * @param object $model
  * @param array $check field to confirm
@@ -199,6 +204,66 @@ class SuperValidatableBehavior extends ModelBehavior {
 				if (!$valid) {
 					return $valid;
 				}	
+			}
+		}
+		return $valid;
+	}
+/**
+ * Checks if a string or a list of strings can be matched in a given text
+ * 
+ * @param object $model
+ * @param array $check text in which the fields' data should be matched in
+ * @param array $params:
+ * 		- fields array list of fields which should be matched against the text (default: array())
+ * 		- ordererd boolean if true, the order in which the fields are specified is important (default: false)
+ * 		- caseSensitive boolean if true, the case of the strings is important (default: false)
+ * @return 
+ */
+	function isWordsInText(&$model, $check, $params = array()) {
+		$valid = false;
+		// Default params
+		$defaultParams = array(
+			'fields' => array(),
+			'ordered' => false,
+			'caseSensitive' => false
+		);
+		// Getting option variables
+		extract(am($defaultParams, $params));
+		$fieldKey = array_pop(array_keys($check));
+		// apply $caseSensitive option to check data
+		$checkData = strval($model->data[$model->alias][$fieldKey]);
+		$caseSensitive or $checkData = low($checkData);
+		// ordered mode
+		if ($ordered) {
+			// compile regular expression
+			$expression = '/.*\\/u';
+			foreach ($fields as $n => $field) {
+				$data = strval($model->data[$model->alias][$field]);
+				// apply caseSensitive option
+				$caseSensitive or $data = low($data);
+				if (!isset($fields[$n+1])) {
+					$group = "({$data}" . ".+)";
+				} else {
+					$group = "({$data}" . ".+)" . "\\\\";
+				}
+				$expression = preg_replace('/\\\\/', $group, $expression);
+			}
+			// do validation
+			$valid = (bool)preg_match($expression, $checkData);
+			return $valid;
+		}
+		// unordered mode
+		foreach ($fields as $field) {
+			$data = strval($model->data[$model->alias][$field]);
+			// apply caseSensitive option
+			$caseSensitive or $data = low($data);
+			// compile expression
+			$expression = "/^.*({$data})" . '.*$/u';
+			// do validation
+			$valid = (bool)preg_match($expression, $checkData);
+			// break on false
+			if (!$valid) {
+				return $valid;
 			}
 		}
 		return $valid;
