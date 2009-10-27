@@ -1,5 +1,11 @@
+
 <?php
 App::import('Security');
+/**
+ * SuperValidatableTestCase
+ * 
+ * Tests for SuperValidatable Behavior
+ */
 class SuperValidatableTestCase extends CakeTestCase {
     var $fixtures = array( 'super_validatable.super_validatable' );
 	

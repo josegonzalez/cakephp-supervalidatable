@@ -5,12 +5,12 @@
  * Packages up some common validation rules into one neat bundle.
  * Highly experimental, all contributiosn welcome :)
  *
- * @package app.models.behaviors
+ * @package super_validatable.models.behaviors
  * @author Jose Diaz-Gonzalez
- * @copyright CakePHP Community
+ * @author Thomas Ploch
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  **/
 class SuperValidatableBehavior extends ModelBehavior {
-
 /**
  * Contains configuration settings for use with individual model objects.
  * Individual model settings should be stored as an associative array,
