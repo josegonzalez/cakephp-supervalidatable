@@ -55,7 +55,7 @@ class SuperValidatableBehavior extends ModelBehavior {
  * @param array  $check the data of the field to be checked 
  * @param integer $value of days | months | years that $check should be in the future
  * @param array $params [optional]
- * 						- 'fields'	array of fields that should be matched against (default: arra())
+ * 						- 'fields'	array of fields that should be matched against (default: array())
  * 						- 'timezone' string timezone identifier (default: 'UTC')
  * @return boolean if $check is at least $value days | months | years in the future
  * @access public
@@ -66,7 +66,7 @@ class SuperValidatableBehavior extends ModelBehavior {
 	function inFuture(&$model, $method, $check, $value ,$params = array()) {
 		$valid = false;
 		// If $check is not a valid date
-		if (!Validation::date(reset($check), 'Y-m-d')) return false;
+		if (!Validation::date(reset($check), 'Y-m-d')) return $valid;
 		// Get the $mode from method name
 		$mode = str_replace('infuture', '', $method);
 		/* PHP5
@@ -80,7 +80,7 @@ class SuperValidatableBehavior extends ModelBehavior {
 		// Get options
 		extract(am($defaultConfig, $params));
 		if (empty($fields)) {
-			return false;
+			return $valid;
 		}
 		// Setting the timezone if possible
 		if (function_exists('date_default_timezone_set')) {
@@ -104,6 +104,9 @@ class SuperValidatableBehavior extends ModelBehavior {
 					//  day. Round the result since crossing over a daylight savings time
 					//  barrier will cause this time to be off by an hour or two.
 					$valid = round(abs($a_new - $b_new) / 86400) >= $params['days'];
+					if (!$valid) {
+						return $valid;
+					}
 				}
 				return $valid;
 			default:
@@ -221,10 +224,9 @@ class SuperValidatableBehavior extends ModelBehavior {
 			),
 			'skip' => false
 		);
-
-		$params = am($defaultParams, $params);
+		// Getting options
+		extract(am($defaultParams, $params));
 		$fieldKey = array_pop(array_keys($check));
-		extract($params);
 		foreach ($fields as $field) {
 			// If skip option is false return on unset fields
 			if (!isset($model->data[$model->alias][$field]) && $skip !== true) {
