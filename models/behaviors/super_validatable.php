@@ -52,9 +52,10 @@ class SuperValidatableBehavior extends ModelBehavior {
  * 						-'field'	field to compare to
  * @return boolean true if dates differ by at least X days, false in all other cases
  * @author Jose Diaz-Gonzalez
+ * @access public
  * @link http://snipplr.com/view/2223/get-number-of-days-between-two-dates/
  */
-	public function daysInFuture($check, $params = array()) {
+	function daysInFuture($check, $params = array()) {
 		if (Validation::date(reset($check), 'ymd')) {
 			if (function_exists('date_default_timezone_set')) {
 				date_default_timezone_set('US/Eastern');
@@ -79,45 +80,52 @@ class SuperValidatableBehavior extends ModelBehavior {
 		}
 		return false;
 	}
+
 /**
- * Returns true if a checkbox is checked, fals otherwise
+ * Returns true if a checkbox is checked, false otherwise
  * 
  * @param object $model
  * @param array $field
- * @return boolean
+ * @return boolean true if checked, false otherwise
+ * @author Jose Diaz-Gonzalez
+ * @access public
  */
 	function isChecked(&$model, $field) {
 		$value = array_values($field);
 		$passed = (in_array($value[0], array('0', 0, false))) ? false : true;
 		return $passed;
 	}
+
 /**
- * Put something here...
+ * Returns whether a field's contents match the contents of every parameter in $model->data
  * 
+ * @access public
  * @param object $model
- * @param array $field [optional]
- * @param array $params [optional]
+ * @param array $field
+ * @param array $params array of fields in $model->data to check
  * @return boolean
+ * @author Jose Diaz-Gonzalez
  */
-	public function notEqualTo(&$model, $field = array(), $params = array()) { 
-		foreach ($field as $key => $value) {
-			foreach ($params as $param) {
-				if (isset($model->data[$model->alias][$param]) and ($value == $model->data[$model->name][$param])) {
-					return false;
-				}
+	function notEqualTo(&$model, $check, $params = array()) { 
+		$value = array_pop(array_values($check));
+		foreach ($params as $param) {
+			if (isset($model->data[$model->alias][$param]) and ($value !== $model->data[$model->name][$param])) {
+				return false;
 			}
 		}
 		return true;
 	}
+
 /**
  * Makes this field required if some other field is marked as true
- *
+ * 
  * @param string $check field to check
  * @param string $params other fields that make this field required
- * @return void
+ * @return boolean true if all fields have been correctly filled
  * @author Jose Diaz-Gonzalez
+ * @access public
  */
-	public function requiredByFields($check, $params = array()) {
+	function requiredByFields($check, $params = array()) {
 		foreach ($params as $param) {
 			if (in_array($model->data[$model->name][$param], array(true, '1')) and empty($check)) {
 				return false;
@@ -125,15 +133,17 @@ class SuperValidatableBehavior extends ModelBehavior {
 		}
 		return true;
 	}
+
 /**
  * Validates that at least one field is not empty
- *
+ * 
  * @param string $check field to check
  * @param string $params array of fields that are related
- * @return boolean true if at least one field has been filled
+ * @return boolean true if at least one field has been filled, false otherwise
  * @author Jose Diaz-Gonzalez
+ * @access public
  */
-	public function validateDependentFields(&$model, $check, $params = array()) {
+	function validateDependentFields(&$model, $check, $params = array()) {
 		$fieldKey = array_pop(array_keys($check));
 		$i = count($params['fields']) + 1;
 		$j = count($params['fields']);
@@ -151,21 +161,23 @@ class SuperValidatableBehavior extends ModelBehavior {
 		}
 		return true;
 	}
+
 /**
  * With this you can validate a field against one or more other fields.
- * @author Thomas Ploch
  * 
  * @param object $model
  * @param array $check field to confirm
  * @param array $params parameter:
- * 	- fields: array list of fields (default: array())
- *  - hash: boolean if the fields should be hashed (default: false)
- *  - hashOptions: options if hash is true:
- *  	- method: string cake's supported hash method (default: 'sha1')
- *  	- salt: boolean if cake's salt should be used (default: true)
- *  	- fields: array list of fields that should be hashed, the others are not hashed (default: array())
- *  - skip: boolean, if you want to continue on fields that don't exist, set this to true (default: false)
+ * 		- fields: array list of fields (default: array())
+ * 		- hash: boolean if the fields should be hashed (default: false)
+ * 		- hashOptions: options if hash is true:
+ * 			- method: string cake's supported hash method (default: 'sha1')
+ * 			- salt: boolean if cake's salt should be used (default: true)
+ * 			- fields: array list of fields that should be hashed, the others are not hashed (default: array())
+ * 		- skip: boolean, if you want to continue on fields that don't exist, set this to true (default: false)
  * @return boolean true if all fields did match, false otherwise
+ * @author Thomas Ploch
+ * @access public
  */
 	function confirmFields(&$model, $check, $params = array()) {
 		$valid = false;
@@ -180,7 +192,7 @@ class SuperValidatableBehavior extends ModelBehavior {
 			),
 			'skip' => false
 		);
-		
+
 		$params = am($defaultParams, $params);
 		$fieldKey = array_pop(array_keys($check));
 		extract($params);
@@ -203,11 +215,12 @@ class SuperValidatableBehavior extends ModelBehavior {
 				// break on false
 				if (!$valid) {
 					return $valid;
-				}	
+				}
 			}
 		}
 		return $valid;
 	}
+
 /**
  * Checks if a string or a list of strings can be matched in a given text
  * 
@@ -217,7 +230,9 @@ class SuperValidatableBehavior extends ModelBehavior {
  * 		- fields array list of fields which should be matched against the text (default: array())
  * 		- ordererd boolean if true, the order in which the fields are specified is important (default: false)
  * 		- caseSensitive boolean if true, the case of the strings is important (default: false)
- * @return 
+ * @return boolean true if words/fields are contained within text, false if otherwise
+ * @author Thomas Ploch
+ * @access public
  */
 	function isWordsInText(&$model, $check, $params = array()) {
 		$valid = false;
