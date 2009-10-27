@@ -31,7 +31,10 @@ class SuperValidatableBehavior extends ModelBehavior {
  * @var array
  * @access public
  */
-	var $mapMethods = array();
+	var $mapMethods = array(
+		'/(days|months|years)InFuture/i' => 'inFuture',
+		'/(days|months|years)InPast/i' => 'inPast'
+	);
 /**
  * Initiate Validatable Behavior
  *
@@ -44,43 +47,69 @@ class SuperValidatableBehavior extends ModelBehavior {
 
 	}
 /**
- * Compares whether or not a date is some number of days after a date
- *
- * @param string $check a valid date string
- * @param string $params 
- * 						-'days' 	minimum number of days in the future,
- * 						-'field'	field to compare to
- * @return boolean true if dates differ by at least X days, false in all other cases
- * @author Jose Diaz-Gonzalez
+ * Compares whether or not a date is some number of days | months | years after a date
+ * This is a magic method and can be called via daysInFuture, monthsInFuture and yearsInFuture
+ * 
+ * @param object $model
+ * @param string $method the name of hte magic method
+ * @param array  $check the data of the field to be checked 
+ * @param integer $value of days | months | years that $check should be in the future
+ * @param array $params [optional]
+ * 						- 'fields'	array of fields that should be matched against (default: arra())
+ * 						- 'timezone' string timezone identifier (default: 'UTC')
+ * @return boolean if $check is at least $value days | months | years in the future
  * @access public
+ * @author Jose Diaz-Gonzales
+ * @author Thomas Ploch
  * @link http://snipplr.com/view/2223/get-number-of-days-between-two-dates/
  */
-	function daysInFuture($check, $params = array()) {
-		if (Validation::date(reset($check), 'ymd')) {
-			if (function_exists('date_default_timezone_set')) {
-				date_default_timezone_set('US/Eastern');
-			}
-			// First we need to break these dates into their constituent parts:
-			if (isset($params['field'])) {
-				$gd_a = getdate(strtotime($model->data[$model->alias][$params['field']]));
-			} else {
-				$gd_a = getdate(strtotime(date('Y-m-d')));
-			}
-			$gd_b = getdate(strtotime(reset($check)));
-
-			// Now recreate these timestamps, based upon noon on each day
-			// The specific time doesn't matter but it must be the same each day
-			$a_new = mktime( 12, 0, 0, $gd_a['mon'], $gd_a['mday'], $gd_a['year'] );
-			$b_new = mktime( 12, 0, 0, $gd_b['mon'], $gd_b['mday'], $gd_b['year'] );
-
-			// Subtract these two numbers and divide by the number of seconds in a
-			//  day. Round the result since crossing over a daylight savings time
-			//  barrier will cause this time to be off by an hour or two.
-			return round(abs($a_new - $b_new) / 86400) >= $params['days'];
+	function inFuture(&$model, $method, $check, $value ,$params = array()) {
+		$valid = false;
+		// If $check is not a valid date
+		if (!Validation::date(reset($check), 'Y-m-d')) return false;
+		// Get the $mode from method name
+		$mode = str_replace('infuture', '', $method);
+		/* PHP5
+		 * $mode = str_replace(low(__METHOD__), '', $method);
+		 */
+		// Default config
+		$defaultConfig = array(
+			'fields' => array(),
+			'timezone' => 'UTC'
+		);
+		// Get options
+		extract(am($defaultConfig, $params));
+		if (empty($fields)) {
+			return false;
 		}
-		return false;
+		// Setting the timezone if possible
+		if (function_exists('date_default_timezone_set')) {
+			date_default_timezone_set($timezone);
+		}
+		/*
+		 * TODO: add cases for months and years to switch
+		 * FIXME: refactor cases into helper functions
+		 */
+		switch ($mode) {
+			case 'days':
+				foreach ($fields as $field) {
+					// First we need to break these dates into their constituent parts:
+					$gd_a = getdate(strtotime($model->data[$model->alias][$field]));
+					$gd_b = getdate(strtotime(reset($check)));
+					// Now recreate these timestamps, based upon noon on each day
+					// The specific time doesn't matter but it must be the same each day
+					$a_new = mktime( 12, 0, 0, $gd_a['mon'], $gd_a['mday'], $gd_a['year'] );
+					$b_new = mktime( 12, 0, 0, $gd_b['mon'], $gd_b['mday'], $gd_b['year'] );
+					// Subtract these two numbers and divide by the number of seconds in a
+					//  day. Round the result since crossing over a daylight savings time
+					//  barrier will cause this time to be off by an hour or two.
+					$valid = round(abs($a_new - $b_new) / 86400) >= $params['days'];
+				}
+				return $valid;
+			default:
+				return $valid;
+		}
 	}
-
 /**
  * Returns true if a checkbox is checked, false otherwise
  * 
