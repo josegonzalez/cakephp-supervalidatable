@@ -148,7 +148,6 @@ class SuperValidatableBehavior extends ModelBehavior {
 		}
 		return true;
 	}
-
 /**
  * Makes this field required if some other field is marked as true
  * 
@@ -166,7 +165,6 @@ class SuperValidatableBehavior extends ModelBehavior {
 		}
 		return true;
 	}
-
 /**
  * Validates that at least one field is not empty
  * 
@@ -194,7 +192,6 @@ class SuperValidatableBehavior extends ModelBehavior {
 		}
 		return true;
 	}
-
 /**
  * With this you can validate a field against one or more other fields.
  * 
@@ -252,7 +249,6 @@ class SuperValidatableBehavior extends ModelBehavior {
 		}
 		return $valid;
 	}
-
 /**
  * Checks if a string or a list of strings can be matched in a given text
  * 
