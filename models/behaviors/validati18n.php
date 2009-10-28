@@ -1,20 +1,48 @@
 <?php
+/**
+ * Behavior for country based validation
+ *
+ * @copyright	2009 Marc Ypes, The Netherlands
+ * @author		Ceeram
+ * @license		http://www.opensource.org/licenses/mit-license.php The MIT License
+ */ 
 class Validati18nBehavior extends ModelBehavior {
-/*
+/**
+* Behavior settings
+* 
+* @access public
+* @var array
+*/
+	public $settings = array(); 
+/**
+* Default setting values
+*
+* @access private
+* @var array
+*/ 	
+	private $defaults = array('country'=>'us');
+/**
  * @param object $Model Model using the behavior
  * @param array $settings Settings to override for model.
  * @access public
+ * @return void
  */
-	function setup(&$Model, $settings = array()) {
-		if (!isset($this->settings[$Model->alias])) {
-			$this->settings[$Model->alias] = array('country' => 'us');
+	function setup(&$Model, $config = null) {
+		if (is_array($config)) {
+			$this->settings[$Model->alias] = array_merge($this->defaults, $config);            
+		} else {
+			$this->settings[$Model->alias] = $this->defaults;
 		}
-		if (!is_array($settings)) {
-			$settings = array();
-		}
-		$this->settings[$Model->alias] = array_merge($this->settings[$Model->alias], $settings);
 	}
-	
+/**
+ * Validation rule for phonenumbers
+ * 
+ * @param object $Model Model using the behavior
+ * @param array $check
+ * @param array $country Override the country from default or settings
+ * @access public
+ * @return boolean
+ */
 	function lc_phone(&$Model, $check, $country = null) {
 		$check = array_values($check);
 		$check = $check[0];
@@ -41,7 +69,15 @@ class Validati18nBehavior extends ModelBehavior {
 		}
 		return preg_match($regex, $check);
 	}
-
+/**
+ * Validation rule for zip codes
+ * 
+ * @param object $Model Model using the behavior
+ * @param array $check
+ * @param array $country Override the country from default or settings
+ * @access public
+ * @return boolean
+ */
 	function lc_postal(&$Model, $check, $country = null) {
 		$check = array_values($check);
 		$check = $check[0];
@@ -84,7 +120,15 @@ class Validati18nBehavior extends ModelBehavior {
 		}
 		return preg_match($regex, $check);
 	}
-	
+/**
+ * Validation rule for social security numbers
+ * 
+ * @param object $Model Model using the behavior
+ * @param array $check
+ * @param array $country Override the country from default or settings
+ * @access public
+ * @return boolean
+ */
 	function lc_ssn(&$Model, $check, $country = null) {
 		$check = array_values($check);
 		$check = $check[0];
@@ -105,6 +149,5 @@ class Validati18nBehavior extends ModelBehavior {
 		}
 		return preg_match($regex, $check);
 	}
-
 }
 ?>
