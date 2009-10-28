@@ -8,6 +8,7 @@
  * @package super_validatable.models.behaviors
  * @author Jose Diaz-Gonzalez
  * @author Thomas Ploch
+ * @copyright 
  * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  **/
 class SuperValidatableBehavior extends ModelBehavior {
