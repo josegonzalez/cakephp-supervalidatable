@@ -45,7 +45,7 @@ class SuperValidatableBehavior extends ModelBehavior {
 	function setup(&$Model, $config) {
 		try {
 			foreach ($config as $module => $moduleconfig) {
-				$behavior = Inflector::camelize($this->settings['modulePrefix'] . $module);
+				$behavior = $this->settings['pluginName'] . '.' . Inflector::camelize($this->settings['modulePrefix'] . $module);
 				$Model->Behaviors->attach($behavior, $moduleconfig);
 			}
 		} catch (Exception $e) {
