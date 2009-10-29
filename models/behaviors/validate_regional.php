@@ -6,7 +6,7 @@
  * @author Ceeram
  * @license http://www.opensource.org/licenses/mit-license.php The MIT License
  */ 
-class Validati18nBehavior extends ModelBehavior {
+class ValidateReionalBehavior extends ModelBehavior {
 /**
 * Behavior settings
 * 
