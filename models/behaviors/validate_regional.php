@@ -1,12 +1,14 @@
 <?php
 /**
- * Behavior for country based validation
+ * ValidateRegional Model Behavior
+ * 
+ * packages validation methods for regional validation (like postal codes)
  *
  * @copyright 2009 Marc Ypes, The Netherlands
  * @author Ceeram
  * @license http://www.opensource.org/licenses/mit-license.php The MIT License
  */ 
-class ValidateReionalBehavior extends ModelBehavior {
+class ValidateRegionalBehavior extends ModelBehavior {
 /**
 * Behavior settings
 * 
