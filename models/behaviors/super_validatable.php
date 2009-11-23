@@ -23,11 +23,13 @@ class SuperValidatableBehavior extends ModelBehavior {
 		'modulePrefix' => 'validate_'
 	); 
 /**
- * @param object $Model Model using the behavior
- * @param array $settings Settings to override for model.
+ * Allows the mapping of preg-compatible regular expressions to public or
+ * private methods in this class, where the array key is a /-delimited regular
+ * expression, and the value is a class method.  Similar to the functionality of
+ * the findBy* / findAllBy* magic methods.
+ *
+ * @var array
  * @access public
-<<<<<<< HEAD
-=======
  */
 	var $mapMethods = array(
 		'/(days|months|years)InFuture/i' => 'inFuture',
@@ -37,16 +39,15 @@ class SuperValidatableBehavior extends ModelBehavior {
  * Initiate Validatable Behavior
  *
  * @param object $model
- * @param array $config
->>>>>>> 7bf40367ee91206632eae5408c882398b04fca9d
+ * @param array $config config to override for model.
  * @return void
  */
 
-	function setup(&$Model, $config) {
+	function setup(&$model, $config) {
 		try {
 			foreach ($config as $module => $moduleconfig) {
 				$behavior = $this->settings['pluginName'] . '.' . Inflector::camelize($this->settings['modulePrefix'] . $module);
-				$Model->Behaviors->attach($behavior, $moduleconfig);
+				$model->Behaviors->attach($behavior, $moduleconfig);
 			}
 		} catch (Exception $e) {
 				// raise an Exception
