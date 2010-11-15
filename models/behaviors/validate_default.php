@@ -149,6 +149,9 @@ class ValidateDefaultBehavior extends ModelBehavior {
 			'skip' => false
 		);
 		// Getting options
+		if (!isset($params['fields']) && !empty($params)) {
+			$params = array('fields' => $params);
+		}
 		extract(am($defaultParams, $params));
 		$fieldKey = array_pop(array_keys($check));
 		foreach ($fields as $field) {
